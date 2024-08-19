@@ -1,0 +1,2930 @@
+ openapi: 3.0.0
+info:
+  title: Event Management System API
+  description: This API allows management of events, bookings, users, and settings in the Event Management System.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Development environment
+tags:
+  - name: Authentication
+  - name: User
+  - name: Category
+  - name: Events
+  - name: Settings
+  - name: Contact
+  - name: Book
+paths:
+  /api/v1/event-administration/entity:
+   post:
+    tags:
+      - User
+    summary: Super Admin Register User
+    description: Allows an admin to register a new user by providing a username, phone number, email, and password.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: AizenBhai
+                description: The username for the new user.
+              phoneNumber:
+                type: string
+                example: '01587654321'
+                description: The phone number for the new user.
+              email:
+                type: string
+                format: email
+                example: aizen@gmail.com
+                description: The email address for the new user.
+              password:
+                type: string
+                format: password
+                example: aizenPass123
+                description: The password for the new user’s account.
+            required:
+              - username
+              - phoneNumber
+              - email
+              - password
+    responses:
+      '201':
+        description: User registered successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User registered successfully.
+                newUser:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      example: AizenBhai
+                    phoneNumber:
+                      type: string
+                      example: 01587654321
+                    email:
+                      type: string
+                      example: aizen@gmail.com
+                     
+      '400':
+        description: Bad request due to invalid or missing input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '409':
+        description: Conflict. The email or phone number is already in use.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Email or phone number is already registered.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/login:
+    post:
+     tags:
+      - Authentication
+     summary: Admin Panel Login
+     description: Endpoint for logging in to the admin panel. This endpoint accepts email and password, and returns an authentication token on successful login.
+     requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                example: uzumaki@gmail.com
+                description: The email address of the admin.
+              password:
+                type: string
+                format: password
+                example: naruto
+                description: The password for the admin account.
+            required:
+              - email
+              - password
+     responses:
+      '200':
+        description: Login successful. Returns a JWT token for further authorization.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: 'Login Successfull'
+                token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      '400':
+        description: Invalid request payload or missing required fields.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Email and password are required.
+      '401':
+        description: Unauthorized access due to incorrect email or password.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid email or password.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/admin/entities/{entityId}:
+   put:
+    tags:
+      - User
+    summary: Super admin Update User Entity
+    description: Update an existing user’s information by specifying the entity ID in the URL.
+    parameters:
+      - name: entityId
+        in: path
+        required: true
+        description: The ID of the user entity to update.
+        schema:
+          type: string
+          example: 6578780dc2dc261bef491a3d
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: khoniker-chele
+                description: The updated username of the user.
+              phoneNumber:
+                type: string
+                example: '01845674349'
+                description: The updated phone number of the user.
+              email:
+                type: string
+                format: email
+                example: motuuu@gmail.com
+                description: The updated email address of the user.
+              password:
+                type: string
+                format: password
+                example: khoniker-chele
+                description: The updated password for the user’s account.
+              role:
+                type: string
+                example: user
+                enum:
+                  - user
+                  - admin
+                description: The role assigned to the user.
+            required:
+              - username
+              - phoneNumber
+              - email
+              - password
+              - role
+    responses:
+      '200':
+        description: User entity updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User entity updated successfully.
+                updatedEntity:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 6578780dc2dc261bef491a3d
+                    username:
+                      type: string
+                      example: khoniker-chele
+                    email:
+                      type: string
+                      example: motuuu@gmail.com
+                    role:
+                      type: string
+                      example: user
+      '400':
+        description: Bad request due to invalid or missing input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '404':
+        description: Not found. The specified entity ID does not exist.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User entity not found.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+   patch:
+    tags:
+      - User
+    summary: Super Admin Block/Unblock User 
+    description: Allows an admin to block or unblock a user entity by specifying the entity ID in the URL.
+    parameters:
+      - name: entityId
+        in: path
+        required: true
+        description: The ID of the user entity to block or unblock.
+        schema:
+          type: string
+          example: 6573db2f4f4752838b89a7f8
+      - name: Content-Type
+        in: header
+        required: true
+        description: The content type of the request.
+        schema:
+          type: string
+          example: application/json
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              block:
+                type: boolean
+                example: true
+                description: Set to `true` to block the user, or `false` to unblock.
+    responses:
+      '200':
+        description: User entity successfully updated (blocked/unblocked).
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User entity has been blocked.
+                entityId:
+                  type: string
+                  example: 6573db2f4f4752838b89a7f8
+      '400':
+        description: Bad request due to invalid or missing input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '404':
+        description: Not found. The specified entity ID does not exist.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User entity not found.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+ 
+  /api/v1/admin/profile/{profileId}:
+   put:
+    tags:
+      - User
+    summary: Update SuperAdmin Profile
+    description: Allows an admin to update the profile information of a superadmin by specifying the profile ID in the URL.
+    parameters:
+      - name: profileId
+        in: path
+        required: true
+        description: The ID of the superadmin profile to update.
+        schema:
+          type: string
+          example: 65734bd071ccbf2414c1e11a
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: naruto
+                description: The updated username for the superadmin.
+              phoneNumber:
+                type: string
+                example: '01845674349'
+                description: The updated phone number for the superadmin.
+              email:
+                type: string
+                format: email
+                example: naruto@gmail.com
+                description: The updated email address for the superadmin.
+              password:
+                type: string
+                format: password
+                example: naruto123
+                description: The updated password for the superadmin. If not provided, the password will remain unchanged.
+            required:
+              - username
+              - phoneNumber
+              - email
+    responses:
+      '200':
+        description: Superadmin profile updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile updated successfully.
+                updatedProfile:
+                  type: object
+                  properties:
+                    profileId:
+                      type: string
+                      example: 65734bd071ccbf2414c1e11a
+                    username:
+                      type: string
+                      example: naruto
+                    phoneNumber:
+                      type: string
+                      example: '01845674349'
+                    email:
+                      type: string
+                      example: naruto@gmail.com
+      '400':
+        description: Bad request due to invalid or missing input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '404':
+        description: Not found. The specified profile ID does not exist.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile not found.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+ 
+  /api/v1/event-administration/profile:
+   put:
+    tags:
+      - User
+    summary: Update Admin Profile
+    description: Allows an admin to update their profile information, including username, phone number, email, and optionally the password.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: naruto
+                description: The updated username for the admin.
+              phoneNumber:
+                type: string
+                example: '04456676777'
+                description: The updated phone number for the admin.
+              email:
+                type: string
+                format: email
+                example: uzumaki@gmail.com
+                description: The updated email address for the admin.
+              password:
+                type: string
+                format: password
+                example: 'newPassword123'
+                description: The new password for the admin. If not provided or set to an empty string, the password will not be changed.
+            required:
+              - username
+              - phoneNumber
+              - email
+    responses:
+      '200':
+        description: Admin profile updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile updated successfully.
+                updatedProfile:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      example: naruto
+                    phoneNumber:
+                      type: string
+                      example: '04456676777'
+                    email:
+                      type: string
+                      example: uzumaki@gmail.com
+      '400':
+        description: Bad request due to invalid or missing input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '401':
+        description: Unauthorized access.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/change-password:
+   put:
+    tags:
+      - Authentication
+    summary: Super Admin Change Password
+    description: Endpoint for super admins to change their password. Requires the current password and the new password.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              oldPassword:
+                type: string
+                format: password
+                example: oldPassword123
+                description: The current password of the admin.
+              newPassword:
+                type: string
+                format: password
+                example: newSecurePassword123
+                description: The new password for the admin account.
+            required:
+              - oldPassword
+              - newPassword
+    responses:
+      '200':
+        description: Password changed successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Password updated successfully.
+      '400':
+        description: Invalid request payload or missing required fields.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Old password and new password are required.
+      '401':
+        description: Unauthorized access due to incorrect old password.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Old password is incorrect.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+
+  /api/v1/event-administration/admin/profile:
+   get:
+    tags:
+      - User
+    summary: Get Admin Profile
+    description: Retrieves the profile information of the currently authenticated admin.
+    responses:
+      '200':
+        description: Admin profile retrieved successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: naruto
+                  description: The username of the admin.
+                phoneNumber:
+                  type: string
+                  example: '04456676777'
+                  description: The phone number of the admin.
+                email:
+                  type: string
+                  format: email
+                  example: uzumaki@gmail.com
+                  description: The email address of the admin.
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: '2024-08-17T08:30:00Z'
+                  description: The date and time when the admin profile was created.
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: '2024-08-17T10:00:00Z'
+                  description: The date and time when the admin profile was last updated.
+      '401':
+        description: Unauthorized access. The request is missing authentication credentials or the provided credentials are invalid.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error. Something went wrong on the server.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+   put:
+    tags:
+      - User
+    summary: Update Admin Profile
+    description: Allows an admin to update their profile information. Only the fields provided in the request body will be updated.
+    requestBody:
+     
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: itachi
+                description: The updated username for the admin. If not provided, the username will remain unchanged.
+              phoneNumber:
+                type: string
+                example: '01845674349'
+                description: The updated phone number for the admin. If not provided, the phone number will remain unchanged.
+              email:
+                type: string
+                format: email
+                example: itachiUchiha@gmail.com
+                description: The updated email address for the admin. If not provided, the email will remain unchanged.
+              password:
+                type: string
+                format: password
+                example: newPassword123
+                description: The new password for the admin. If not provided or set to an empty string, the password will not be changed.
+ 
+    responses:
+      '200':
+        description: Admin profile updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile updated successfully.
+                updatedProfile:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      example: itachi
+                    phoneNumber:
+                      type: string
+                      example: '01845674349'
+                    email:
+                      type: string
+                      example: itachiUchiha@gmail.com
+      '400':
+        description: Bad request due to invalid or missing input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '401':
+        description: Unauthorized access. The request is missing authentication credentials or the provided credentials are invalid.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error. Something went wrong on the server.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/logout:
+   post:
+    tags:
+      - Authentication
+    summary: Admin Panel Logout
+    description: Endpoint for logging out from the admin panel. This will invalidate the current session and revoke the authentication token.
+    requestBody:
+      required: false
+      content:
+        application/json: {}
+    responses:
+      '200':
+        description: Successfully logged out.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Logout successful.
+      '401':
+        description: Unauthorized access. No active session or invalid token.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized. Please log in again.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/admin/users/{userId}/blockunblock:
+   patch:
+     tags:
+       - User
+     summary: Admin Block/Unblock User
+     description: Allows an admin to block or unblock a user based on the `block` flag provided in the request body.
+     parameters:
+      - name: userId
+        in: path
+        required: true
+        description: The unique identifier of the user to be blocked or unblocked.
+        schema:
+          type: string
+          example: 6573d29c4f4752838b89a7f0
+     requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              block:
+                type: boolean
+                example: true
+                description: A flag indicating whether to block (`true`) or unblock (`false`) the user.
+            required:
+              - block
+     responses:
+      '200':
+        description: User status updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User status updated successfully.
+                userId:
+                  type: string
+                  example: 6573d29c4f4752838b89a7f0
+                blocked:
+                  type: boolean
+                  example: true
+                  description: Indicates whether the user has been blocked or not.
+      '400':
+        description: Bad request due to invalid input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid request data. Please check the provided information.
+      '401':
+        description: Unauthorized access. The request is missing authentication credentials or the provided credentials are invalid.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '404':
+        description: User not found. The specified user ID does not exist.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User not found. Please check the user ID.
+      '500':
+        description: Internal server error. Something went wrong on the server.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/admin/change-password:
+   put:
+    tags:
+      - Authentication
+    summary: Admin Password Change
+    description: Allows an admin to change their password by providing the current password and a new password.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              oldPassword:
+                type: string
+                format: password
+                example: itachiUchiha
+                description: The current password of the admin.
+              newPassword:
+                type: string
+                format: password
+                example: itachiNewPass123
+                description: The new password to be set for the admin account.
+            required:
+              - oldPassword
+              - newPassword
+    responses:
+      '200':
+        description: Password changed successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Password updated successfully.
+      '400':
+        description: Invalid request payload or missing required fields.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Old password and new password are required.
+      '401':
+        description: Unauthorized. Incorrect old password provided.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Old password is incorrect.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/users:
+   post:
+    tags:
+      - User
+    summary: Create New User
+    description: Allows an admin to create a new user with the specified details.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: SophieJohnson
+                description: The username for the new user.
+              phoneNumber:
+                type: string
+                example: '01776543210'
+                description: The phone number for the new user.
+              email:
+                type: string
+                format: email
+                example: sophie.j@example.com
+                description: The email address for the new user.
+              password:
+                type: string
+                format: password
+                example: sophiePass
+                description: The password for the new user.
+            required:
+              - username
+              - email
+              - password
+    responses:
+      '201':
+        description: User created successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User created successfully.
+                user:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 60d5f4f4f4f4f4f4f4f4f4f
+                    username:
+                      type: string
+                      example: SophieJohnson
+                    phoneNumber:
+                      type: string
+                      example: '01776543210'
+                    email:
+                      type: string
+                      example: sophie.j@example.com
+      '400':
+        description: Bad request due to invalid input data.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '401':
+        description: Unauthorized access. The request is missing authentication credentials or the provided credentials are invalid.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error. Something went wrong on the server.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/users/{userId}:
+   put:
+    tags:
+      - User
+    summary: Update User Information
+    description: Allows an admin to update the details of a specific user identified by `userId`. Only the fields provided in the request body will be updated.
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        description: The unique identifier of the user to be updated.
+        schema:
+          type: string
+          example: 657bc8646da4e44510e9a50f
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: LilyBrown
+                description: The updated username for the user. If not provided, the username will remain unchanged.
+              phoneNumber:
+                type: string
+                example: '55537778888'
+                description: The updated phone number for the user. If not provided, the phone number will remain unchanged.
+              email:
+                type: string
+                format: email
+                example: lily.b@example.com
+                description: The updated email address for the user. If not provided, the email will remain unchanged.
+            required:
+              - email
+    responses:
+      '200':
+        description: User information updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User updated successfully.
+                updatedUser:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 657bc8646da4e44510e9a50f
+                    username:
+                      type: string
+                      example: LilyBrown
+                    phoneNumber:
+                      type: string
+                      example: '55537778888'
+                    email:
+                      type: string
+                      example: lily.b@example.com
+      '400':
+        description: Bad request due to invalid input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '401':
+        description: Unauthorized access. The request is missing authentication credentials or the provided credentials are invalid.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '404':
+        description: User not found. The specified user ID does not exist.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User not found. Please check the user ID.
+      '500':
+        description: Internal server error. Something went wrong on the server.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/entities/{entityId}:
+   put:
+    tags:
+      - User
+    summary: Edit Entity Details
+    description: Allows a super-admin to update the details of a specific entity identified by `entityId`. The provided fields will be updated based on the input.
+    parameters:
+      - name: entityId
+        in: path
+        required: true
+        description: The unique identifier of the entity to be updated.
+        schema:
+          type: string
+          example: 6573dae34f4752838b89a7f3
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: itachi
+                description: The updated username for the entity. If not provided, the username will remain unchanged.
+              phoneNumber:
+                type: string
+                example: '01587654321'
+                description: The updated phone number for the entity. If not provided, the phone number will remain unchanged.
+              email:
+                type: string
+                format: email
+                example: itachi@gmail.com
+                description: The updated email address for the entity. If not provided, the email will remain unchanged.
+              password:
+                type: string
+                format: password
+                example: itachi
+                description: The updated password for the entity. If not provided, the password will remain unchanged.
+              role:
+                type: string
+                example: admin
+                description: The updated role for the entity. If not provided, the role will remain unchanged.
+            required:
+              - email
+    responses:
+      '200':
+        description: Entity details updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Entity updated successfully.
+                
+  /api/v1/event-administration/upload-profile-image:
+   patch:
+    tags:
+      - User
+    summary: Upload Profile Image for Super-Admin
+    description: Allows a super-admin to upload or update their profile image. The image is uploaded as a binary file.
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              image:
+                type: string
+                format: binary
+                description: The profile image file to be uploaded.
+    responses:
+      '200':
+        description: Profile image uploaded successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile image uploaded successfully.
+                imageUrl:
+                  type: string
+                  example: https://example.com/path/to/profile-image.jpg
+      '400':
+        description: Bad request due to invalid file or input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid file format or missing file.
+      '401':
+        description: Unauthorized access. The request is missing authentication credentials or the provided credentials are invalid.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error. Something went wrong on the server.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/entities:
+   post:
+    tags:
+      - User
+    summary: Super Admin  Create New User Entity
+    description: Allows an super admin to create a new user entity with basic details including username, phone number, email, and role.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: khoniker-chele
+              phoneNumber:
+                type: string
+                example: '01845674334'
+              email:
+                type: string
+                example: motuuu@gmail.com
+              password:
+                type: string
+                description: The user’s password (optional during initial creation).
+                example: ''
+              role:
+                type: string
+                example: user
+    responses:
+      '200':
+        description: Entity created successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Entity created successfully.
+                entity:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 6573dae34f4752838b89a7f3
+                    username:
+                      type: string
+                      example: khoniker-chele
+                    email:
+                      type: string
+                      example: motuuu@gmail.com
+                    role:
+                      type: string
+                      example: user
+      '400':
+        description: Bad request due to invalid input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data.
+      '401':
+        description: Unauthorized access.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/events/approve/{eventId}:
+   patch:
+    tags:
+      - Events
+    summary: Approve a Pending Event
+    description: Allows an admin to approve a pending event by specifying its ID.
+    parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: string
+        description: The ID of the event to approve.
+    requestBody:
+      content: {}
+    responses:
+      '200':
+        description: Event approved successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event approved successfully.
+      '404':
+        description: Event not found.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event not found.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/categories/:
+   post:
+    tags:
+      - Category
+    summary: Create a New Category
+    description: Allows an admin to create a new category with a name, description, and an image.
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the category.
+                example: Drinks
+              description:
+                type: string
+                description: Description of the category.
+                example: This is the Drinks category.
+              image:
+                type: string
+                format: binary
+                description: The image representing the category.
+    responses:
+      '200':
+        description: Category created successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Category created successfully.
+                categoryId:
+                  type: string
+                  example: 64abf1234c3b8f001233ed99
+      '400':
+        description: Bad request due to missing required fields or invalid data.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check and try again.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+
+   get:
+    tags:
+      - Category
+    summary: Get All Categories
+    description: Retrieves a list of all categories.
+    responses:
+      '200':
+        description: Successfully retrieved all categories.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  categoryId:
+                    type: string
+                    example: 64abf1234c3b8f001233ed99
+                  name:
+                    type: string
+                    example: Drinks
+                  description:
+                    type: string
+                    example: This is the Drinks category.
+                  imageUrl:
+                    type: string
+                    example: https://example.com/images/drinks.png
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-administration/categories/{categoryId}:
+   put:
+    tags:
+      - Category
+    summary: Update an Existing Category
+    description: Allows an admin to update an existing category by providing a new name, description, or image.
+    parameters:
+      - in: path
+        name: categoryId
+        required: true
+        schema:
+          type: string
+        description: The ID of the category to update.
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Updated name of the category.
+                example: Anime
+              description:
+                type: string
+                description: Updated description of the category.
+                example: This is the biggest fest ever.
+              image:
+                type: string
+                format: binary
+                description: The updated image representing the category.
+    responses:
+      '200':
+        description: Category updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Category updated successfully.
+                categoryId:
+                  type: string
+                  example: 659ca4c8c923e83c359ad3f5
+      '400':
+        description: Bad request due to missing required fields or invalid data.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check and try again.
+      '404':
+        description: Category not found.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Category not found.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  
+   delete:
+    tags:
+      - Category
+    summary: Delete a Category
+    description: Allows an admin to delete a category by specifying its ID.
+    parameters:
+      - in: path
+        name: categoryId
+        required: true
+        schema:
+          type: string
+        description: The ID of the category to delete.
+    responses:
+      '200':
+        description: Category deleted successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Category deleted successfully.
+      '404':
+        description: Category not found.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Category not found.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later
+  /api/v1/event-administration/events:
+   post:
+    tags:
+      - Events
+    summary: Admin can Create a new event
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: Summer Dancing Festival
+              date:
+                type: string
+                format: date
+                example: '2024-02-16'
+              location:
+                type: string
+                example: Atriam, notun-bazar, Dhaka-1212
+              capacity:
+                type: integer
+                example: 120
+              category:
+                type: string
+                example: 65a3e9a81bec3ba80b3d147f
+              image:
+                type: string
+                format: binary
+              price:
+                type: integer
+                example: 445
+              description:
+                type: string
+                example: Join us for a day of music, food, and fun in the sun!
+    responses:
+      '200':
+        description: Event created successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event created successfully
+ 
+      '400':
+        description: Bad request, invalid input
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while processing the request
+  /api/v1/event-administration/events/:
+    get:
+      tags:
+        - Events
+      summary: get-all-events
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/event-administration/events/{eventId}:
+   put:
+    tags:
+      - Events
+    summary: Update an existing event
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 65c1b4a6c388a567e170a8f5
+        description: ID of the event to be updated
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: Coding dojoo
+              description:
+                type: string
+                example: This is a sample event description
+              date:
+                type: string
+                format: date-time
+                example: '2024-02-07T00:00:00.000Z'
+              location:
+                type: string
+                example: Sample Location
+              capacity:
+                type: integer
+                example: 100
+              image:
+                type: string
+                format: uri
+                example: https://res.cloudinary.com/dobzvjjld/image/upload/v1707193307/event_management/uploads/nature.jpg
+            required:
+              - title
+              - description
+              - date
+              - location
+              - capacity
+              - image
+    responses:
+      '200':
+        description: Event updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event updated successfully
+                updatedEvent:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 65c1b4a6c388a567e170a8f5
+                    title:
+                      type: string
+                      example: Coding dojoo
+                    description:
+                      type: string
+                      example: This is a sample event description
+                    date:
+                      type: string
+                      format: date-time
+                      example: '2024-02-07T00:00:00.000Z'
+                    location:
+                      type: string
+                      example: Sample Location
+                    capacity:
+                      type: integer
+                      example: 100
+                    image:
+                      type: string
+                      format: uri
+                      example: https://res.cloudinary.com/dobzvjjld/image/upload/v1707193307/event_management/uploads/nature.jpg
+              required:
+                - message
+                - updatedEvent
+      '400':
+        description: Bad request, invalid input data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data
+      '404':
+        description: Event not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event not found
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while updating the event
+   delete:
+    tags:
+      - Events
+    summary: Admin can delete an event
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The ID of the event to delete
+    responses:
+      '200':
+        description: Event deleted successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event deleted successfully
+      '404':
+        description: Event not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event not found
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while processing the request
+  /api/v1/event-administration/events/sort:
+   get:
+    tags:
+      - Events
+    summary: Sort events by a specified field and order
+    parameters:
+      - name: sortBy
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [date, location, capacity, price, title] # Adjust according to the fields available for sorting
+        example: date
+        description: Field to sort by
+      - name: sortOrder
+        in: query
+        required: true
+        schema:
+          type: string
+          enum: [asc, desc]
+        example: asc
+        description: Order to sort by, either ascending or descending
+    responses:
+      '200':
+        description: Successfully retrieved sorted events
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                events:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 65c1f08171acd2815db0de5a
+                      title:
+                        type: string
+                        example: Summer Dancing Festival
+                      date:
+                        type: string
+                        example: '2024-02-16'
+                      location:
+                        type: string
+                        example: Atriam,notun-bazar,Dhaka-1212
+                      capacity:
+                        type: integer
+                        example: 120
+                      category:
+                        type: string
+                        example: 65a3e9a81bec3ba80b3d147f
+                      image:
+                        type: string
+                        example: http://example.com/image.jpg
+                      price:
+                        type: integer
+                        example: 445
+                      description:
+                        type: string
+                        example: Join us for a day of music, food, and fun in the sun!
+              required:
+                - events
+      '400':
+        description: Bad request, invalid parameters
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid query parameters
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while processing the request
+  /api/v1/event-administration/events/{eventId}/duplicate:
+   post:
+    tags:
+      - Events
+    summary: Duplicate an existing event
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 65c1b4a6c388a567e170a8f5
+        description: ID of the event to be duplicated
+    requestBody:
+      content: {}
+    responses:
+      '200':
+        description: Successfully duplicated the event
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                originalEventId:
+                  type: string
+                  example: 65c1b4a6c388a567e170a8f5
+                  description: ID of the original event that was duplicated
+                newEvent:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 65c1b4a6c388a567e170a8f6
+                    title:
+                      type: string
+                      example: Summer Dancing Festival
+                    date:
+                      type: string
+                      example: '2024-02-16'
+                    location:
+                      type: string
+                      example: Atriam,notun-bazar,Dhaka-1212
+                    capacity:
+                      type: integer
+                      example: 120
+                    category:
+                      type: string
+                      example: 65a3e9a81bec3ba80b3d147f
+                    image:
+                      type: string
+                      example: http://example.com/image.jpg
+                    price:
+                      type: integer
+                      example: 445
+                    description:
+                      type: string
+                      example: Join us for a day of music, food, and fun in the sun!
+              required:
+                - originalEventId
+                - newEvent
+      '400':
+        description: Bad request, invalid event ID
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid event ID or duplication failed
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while processing the request
+
+  /api/v1/event-administration/settings:
+   get:
+    tags:
+      - Settings
+    summary: Get settings data
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                settings:
+                  type: object
+                  properties:
+                    siteName:
+                      type: string
+                      example: Event Management Platform
+                    logoUrl:
+                      type: string
+                      example: 'https://example.com/logo.png'
+                    contactEmail:
+                      type: string
+                      example: 'support@example.com'
+                    socialLinks:
+                      type: object
+                      properties:
+                        facebook:
+                          type: string
+                          example: 'https://facebook.com/example'
+                        twitter:
+                          type: string
+                          example: 'https://twitter.com/example'
+                        instagram:
+                          type: string
+                          example: 'https://instagram.com/example'
+        
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while retrieving the settings data
+  /api/v1/event-administration/settings/:
+   post:
+    tags:
+      - Settings
+    summary: Change settings
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              image:
+                type: string
+                format: binary
+              siteName:
+                type: string
+                example: My Website
+              siteTitle:
+                type: string
+                example: Welcome to My Website
+              themeColor:
+                type: string
+                example: '#3366ff'
+              footerDescription:
+                type: string
+                example: "© 2024 My Website. All rights reserved."
+              taxOnTicket:
+                type: integer
+                example: '5'
+              backupAndRestore:
+                type: boolean
+                example: true
+              currencyOptions:
+                type: string
+                example: USD
+              siteLanguage:
+                type: string
+                example: English
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Settings updated successfully
+                settings:
+                  type: object
+                  properties:
+                    siteName:
+                      type: string
+                      example: My Website
+                    siteTitle:
+                      type: string
+                      example: Welcome to My Website
+                    themeColor:
+                      type: string
+                      example: '#3366ff'
+                    footerDescription:
+                      type: string
+                      example: "© 2024 My Website. All rights reserved."
+                    taxOnTicket:
+                      type: integer
+                      example: 5
+                    backupAndRestore:
+                      type: boolean
+                      example: true
+                    currencyOptions:
+                      type: string
+                      example: USD
+                    siteLanguage:
+                      type: string
+                      example: English
+  /api/v1/event-management/register:
+   post:
+    tags:
+      - Authentication
+    summary: User Registration
+    description: Endpoint for new users to register. This requires a username, phone number, email, and password.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: Md Nadim Sarkar
+                description: The full name of the user.
+              phoneNumber:
+                type: string
+                example: '01974563491'
+                description: The phone number of the user.
+              email:
+                type: string
+                format: email
+                example: sarkar@gmail.com
+                description: The email address of the user.
+              password:
+                type: string
+                format: password
+                example: Md-Nadim-Sarkar
+                description: The password for the user's account.
+            required:
+              - username
+              - phoneNumber
+              - email
+              - password
+    responses:
+      '201':
+        description: User registered successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: User registered successfully.
+      '400':
+        description: Invalid input data or missing required fields.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data. Please check the provided information.
+      '409':
+        description: Conflict. The email or phone number is already in use.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Email or phone number is already registered.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-management/logout:
+   post:
+    tags:
+      - Authentication
+    summary: User Logout
+    description: Logs out the user by invalidating the current session or token.
+    requestBody:
+      required: false
+      content: {}
+    responses:
+      '200':
+        description: User logged out successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Logout successful.
+      '401':
+        description: Unauthorized. No valid session or token found.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/event-management/login:
+   post:
+    tags:
+      - Authentication
+    summary: User Login
+    description: Authenticate a user and return an access token if the credentials are correct.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+                example: kamal.i@example.com
+                description: The email address associated with the user's account.
+              password:
+                type: string
+                format: password
+                example: kamalPass123
+                description: The password for the user's account.
+            required:
+              - email
+              - password
+    responses:
+      '200':
+        description: Login successful. Returns the access token and user details.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  description: JWT token for authenticated requests.
+                message:
+                  type: string
+                  example: "Login Successfull"
+      '400':
+        description: Bad request due to missing or invalid fields.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Email and password are required.
+      '401':
+        description: Unauthorized. Invalid email or password.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Incorrect email or password.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/user-dasboard/user/profile:
+   get:
+    tags:
+      - User
+    summary: Get User Profile
+    description: Retrieves the profile information of the currently logged-in user.
+    responses:
+      '200':
+        description: Profile retrieved successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: Shanto Kumar Roy
+                phoneNumber:
+                  type: string
+                  example: '01587654321'
+                email:
+                  type: string
+                  example: myboi332@gmail.com
+      '401':
+        description: Unauthorized access. The user must be logged in to access their profile.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+
+   put:
+    tags:
+      - User
+    summary: Update User Profile
+    description: Allows the user to update their profile information, such as username, phone number, and email.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: Shanto Kumar Roy
+              phoneNumber:
+                type: string
+                example: '01587654321'
+              email:
+                type: string
+                example: myboi332@gmail.com
+    responses:
+      '200':
+        description: Profile updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile updated successfully.
+      '400':
+        description: Bad request due to invalid input.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data.
+      '401':
+        description: Unauthorized access. The user must be logged in to update their profile.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/user-dasboard/user/change-password:
+   put:
+    tags:
+      - User
+    summary: Change/Reset User Password
+    description: Allows a user to change or reset their password by providing the old password and a new password.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              oldPassword:
+                type: string
+                example: kodu-sarkar
+              newPassword:
+                type: string
+                example: Md-Nadim-Sarkar
+    responses:
+      '200':
+        description: Password changed successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Password changed successfully.
+      '400':
+        description: Bad request due to invalid input or incorrect old password.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: The old password is incorrect or invalid input.
+      '401':
+        description: Unauthorized access. The user must be logged in to change their password.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Unauthorized access. Please log in.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/user-dasboard/user/upload-profile-image:
+   get:
+    tags:
+      - User
+    summary: Get User Profile Image
+    description: Fetches the user's profile image.
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageUrl:
+                  type: string
+                  example: https://example.com/images/profile.png
+      '404':
+        description: Profile image not found.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile image not found.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+
+   patch:
+    tags:
+      - User
+    summary: Update User Profile Image
+    description: Allows a user to update their profile image.
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              image:
+                type: string
+                format: binary
+                description: The image file to be uploaded.
+    responses:
+      '200':
+        description: Profile image updated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Profile image updated successfully.
+                imageUrl:
+                  type: string
+                  example: https://example.com/images/updated-profile.png
+      '400':
+        description: Bad request due to invalid file format or missing file.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid file format or no file uploaded.
+      '500':
+        description: Internal server error.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Something went wrong. Please try again later.
+  /api/v1/user-dasboard/user/event/{eventId}:
+   put:
+    tags:
+      - Events
+    summary: Update an event created by a user
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 65d6160d8b4595091b6daf13
+        description: ID of the event to be updated
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              price:
+                type: integer
+                example: 4444
+              title:
+                type: string
+                example: asfsadfdsafadsfadsf
+            required:
+              - price
+              - title
+    responses:
+      '200':
+        description: Event updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event updated successfully
+                updatedEvent:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 65d6160d8b4595091b6daf13
+                    price:
+                      type: integer
+                      example: 4444
+                    title:
+                      type: string
+                      example: asfsadfdsafadsfadsf
+              required:
+                - message
+                - updatedEvent
+      '400':
+        description: Bad request, invalid input data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data
+      '404':
+        description: Event not found
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event not found
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while updating the event
+  /api/v1/user-dasboard/user/event:
+   post:
+    tags:
+      - Events
+    summary: Create a new event by a user
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: 'This is a dummy title'
+              description:
+                type: string
+                example: 'The dummy sports in recent time'
+              date:
+                type: string
+                example: '2023-02-21'
+              location:
+                type: string
+                example: 'Barishal'
+              capacity:
+                type: integer
+                example: 100
+              image:
+                type: string
+                format: binary
+              category:
+                type: string
+                example: '65a3e9a81bec3ba80b3d147f'
+              price:
+                type: integer
+                example: 300
+            required:
+              - title
+              - description
+              - date
+              - location
+              - capacity
+              - category
+              - price
+    responses:
+      '200':
+        description: Event created successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Event created successfully
+                event:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: '65d6160d8b4595091b6daf13'
+                    title:
+                      type: string
+                      example: 'This is a dummy title'
+                    description:
+                      type: string
+                      example: 'The dummy sports in recent time'
+                    date:
+                      type: string
+                      example: '2023-02-21'
+                    location:
+                      type: string
+                      example: 'Barishal'
+                    capacity:
+                      type: integer
+                      example: 100
+                    image:
+                      type: string
+                      example: 'https://example.com/image.jpg'
+                    category:
+                      type: string
+                      example: '65a3e9a81bec3ba80b3d147f'
+                    price:
+                      type: integer
+                      example: 300
+              required:
+                - message
+                - event
+      '400':
+        description: Bad request, invalid input data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Invalid input data
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: An error occurred while creating the event
+  /api/v1/user-dasboard/user/send-message:
+   post:
+    tags:
+      - Contact
+    summary: User send message
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: Website Feedback
+              email:
+                type: string
+                example: feedback@example.org
+              phoneNumber:
+                type: string
+                example: '1234567890'
+              message:
+                type: string
+                example: The search function is not returning relevant results.
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Message sent successfully
+                status:
+                  type: string
+                  example: success
+  /api/v1/event-management/events/{eventId}/book:
+   post:
+    tags:
+      - Book
+    summary: User booking event
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 65df56c8f8987b61c0be5b64
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ticketQuantity:
+                type: integer
+                example: 5
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Booking successful
+                status:
+                  type: string
+                  example: success
+                bookingDetails:
+                  type: object
+                  properties:
+                    eventId:
+                      type: string
+                      example: 65df56c8f8987b61c0be5b64
+                    ticketQuantity:
+                      type: integer
+                      example: 5
+                    totalPrice:
+                      type: number
+                      format: float
+                      example: 1500.00
+  /api/v1/event-management/events/bookings:
+   get:
+    tags:
+      - Book
+    summary: User get booking data
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bookings:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      bookingId:
+                        type: string
+                        example: 64d22b9c9d3e8a6b6d5f1234
+                      eventId:
+                        type: string
+                        example: 65df56c8f8987b61c0be5b64
+                      eventTitle:
+                        type: string
+                        example: Summer Dancing Festival
+                      ticketQuantity:
+                        type: integer
+                        example: 5
+                      totalPrice:
+                        type: number
+                        format: float
+                        example: 1500.00
+                      bookingDate:
+                        type: string
+                        format: date-time
+                        example: '2024-08-18T14:30:00Z'
+                message:
+                  type: string
+                  example: Booking data retrieved successfully
+                status:
+                  type: string
+                  example: success
+  /api/v1/event-management/events/bookings/{bookingId}/request-cancellation:
+   patch:
+    tags:
+      - Book
+    summary: User cancel booking request
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 65e74d2ef5bd0e6597ac68cf
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            example:
+              reason: Change of plans
+    responses:
+      '200':
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Booking cancellation request submitted successfully
+                status:
+                  type: string
+                  example: success
