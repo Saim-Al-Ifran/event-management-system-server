@@ -69,12 +69,12 @@ const loginController = async(req,res,next)=>{
                     return next(new CustomError('Failed to generate token'));
                }
        
-               return res.status(202).json({message:'Login Successfull',token});
+               return res.status(202).json({message:'Login Successfull',token,data:{user:payload}});
 
         } catch (err) {
               next(new CustomError(err.message,500));
         }
-}
+} 
 
 const logoutController =  (_req, res) => {
       res.clearCookie('jwt');
