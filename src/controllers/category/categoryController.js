@@ -7,10 +7,12 @@ const paginate = require('../../utils/paginate');
 
 const getCategories = async (req, res, next) => {
     try {
-      const { page, limit } = req.pagination;
-  
-      // Get paginated results
-      const paginationResult = await paginate(Category,{}, page,limit);
+      let { page, limit } = req.pagination;
+      const { search } = req.query;
+      const query = search
+      ? { name: { $regex: search, $options: 'i' } } // Case-insensitive search
+      : {};
+      const paginationResult = await paginate(Category,query, page,limit);
   
       if (paginationResult.data.length === 0) {
         return next(new CustomError('No categories found', 404));
