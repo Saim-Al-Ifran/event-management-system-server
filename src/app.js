@@ -7,10 +7,15 @@ const { nodeEnv } = require('./secret');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const router = require('./routes/index');
+const swaggerUI = require('swagger-ui-express');
+const YAML = require('yamljs');
+const path = require('path');
+const swaggerDoc = YAML.load(path.join(__dirname, './docs/swagger.yaml'));
 
 // Middlewares //
 app.use(cookieParser());
 app.use(express.json());
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDoc));
 app.use(helmet());
 if(nodeEnv !== 'production'){
        const morgan = require('morgan');
