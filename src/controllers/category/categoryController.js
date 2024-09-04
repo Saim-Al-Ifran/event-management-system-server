@@ -2,19 +2,27 @@ const CustomError = require('../../errors/CustomError');
 const Category = require('../../models/Category');
 const { deleteImageFromCloudinary } = require('../../utils/deleteImageFromCloudinary');
 const {uploadImageToCloudinary} = require('../../utils/imageUploadCloudinary');
+const paginate = require('../../utils/paginate');
 
 
-const getCategories = async(_req,res,next)=>{
-       try {
-             const categories = await Category.find({});
-             if(categories.length === 0){
-                  return next(new CustomError('No categories found',404));
-             }
-             res.status(200).json({categories:categories});
-       }catch(err){
-            next(new CustomError(err.message,500));
-       }
-}
+const getCategories = async (req, res, next) => {
+    try {
+      const { page, limit } = req.pagination;
+  
+      // Get paginated results
+      const paginationResult = await paginate(Category,{}, page,limit);
+  
+      if (paginationResult.data.length === 0) {
+        return next(new CustomError('No categories found', 404));
+      }
+  
+      // Respond with paginated data and metadata
+      res.status(200).json(paginationResult);
+    } catch (err) {
+      console.error(err.message);
+      next(new CustomError('Internal Server Error', 500));
+    }
+  };
 
 const createCategory = async(req,res,next)=>{
           

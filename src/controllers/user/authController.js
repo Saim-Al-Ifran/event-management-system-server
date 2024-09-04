@@ -49,7 +49,7 @@ const loginController = async(req,res,next)=>{
                      return next(new CustomError('Unauthorized',403))
                }
                if(user.role  === 'user'){
-                   return next(new CustomError('Access Denied: Regular users are not authorized to perform this action.',403))
+                   return next(new CustomError('Access Denied: Only admins are authorized to log in',403))
                }
                const isMatch = await bcrypt.compare(password,user.password);
                if(!isMatch){
