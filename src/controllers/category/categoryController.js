@@ -26,6 +26,24 @@ const getCategories = async (req, res, next) => {
     }
   };
 
+  const getCategoryById = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        const category = await Category.findById(categoryId);
+
+        if (!category) {
+            return next(new CustomError('Category not found', 404));
+        }
+
+        res.status(200).json({ category });
+    } catch (err) {
+        if (err.name === 'CastError') {
+            return next(new CustomError('Invalid category ID', 400));
+        }
+        next(new CustomError(err.message, 500));
+    }
+};
+
 const createCategory = async(req,res,next)=>{
           
            try {
@@ -115,6 +133,7 @@ const deleteCategory = async (req, res, next) => {
 
 module.exports ={
     getCategories,
+    getCategoryById,
     createCategory,
     updateCategory,
     deleteCategory

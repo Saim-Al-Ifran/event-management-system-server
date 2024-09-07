@@ -10,6 +10,7 @@ const validateCategoryFields = [
     .withMessage('Description is required'),
 
     body('image')
+    .optional() 
     .custom((_value, { req }) => {
       if (!req.file) {
         throw new Error('Image field required');
