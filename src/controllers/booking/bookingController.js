@@ -1,6 +1,23 @@
 const Booking = require('../../models/Booking');
 const Event = require('../../models/Event');
 const CustomError = require('../../errors/CustomError');
+const paginate = require('../../utils/paginate');
+
+
+const getAllBookings = async (req, res, next) => {
+    try {
+        let { page, limit } = req.pagination;
+        const bookings = await paginate(Booking, {}, page, limit, {}, 'eventId');
+        
+        if (bookings.data.length === 0) {
+            return next(new CustomError('No booking found!', 404));
+        }
+
+        res.status(200).json(bookings);
+    } catch (err) {
+        next(new CustomError(err.message, 500));
+    }
+};
 
 
 const getBookingsForUser = async (req, res, next) => {
@@ -126,6 +143,7 @@ const deleteBookings = async(req,res,next)=>{
 }
 
 module.exports = {
+    getAllBookings,
     getBookingsForUser, 
     bookEvent,
     requestBookingCancellation,
