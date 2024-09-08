@@ -1,43 +1,38 @@
 const { body } = require('express-validator');
 
-
 const validateSettingFields = [
     body('siteName')
         .notEmpty()
         .withMessage('Site name is required'),
 
-    body('siteTitle')
+    body('siteLogo')
+        .optional()
         .notEmpty()
-        .withMessage('Site title is required'),
-
-    body('themeColor')
-        .notEmpty()
-        .withMessage('Theme color is required'),
+        .withMessage('Site logo is required'),
 
     body('footerDescription')
         .notEmpty()
         .withMessage('Footer description is required'),
 
-    body('taxOnTicket')
+    body('facebook')
         .notEmpty()
-        .withMessage('Tax on ticket is required')
-        .isNumeric()
-        .withMessage('Tax on ticket must be a number'),
+        .withMessage('Facebook link is required')
+        .isURL()
+        .withMessage('Facebook link must be a valid URL'),
 
-    body('backupAndRestore')
-        .optional()
-        .isBoolean()
-        .withMessage('Backup and restore must be a boolean'),
-
-    body('currencyOptions')
+    body('twitter')
         .notEmpty()
-        .withMessage('Currency options is required'),
+        .withMessage('Twitter link is required')
+        .isURL()
+        .withMessage('Twitter link must be a valid URL'),
 
-    body('siteLanguage')
+    body('instagram')
         .notEmpty()
-        .withMessage('Site language is required')
+        .withMessage('Instagram link is required')
+        .isURL()
+        .withMessage('Instagram link must be a valid URL')
 ];
 
 module.exports = {
     validateSettingFields
-}
+};

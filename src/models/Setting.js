@@ -1,35 +1,32 @@
 const mongoose = require('mongoose');
 
 const settingSchema = new mongoose.Schema({
+  siteName: { 
+    type: String,
+    required: true
+  },
   siteLogo: {
-    type: String, // Assuming the logo is stored as a file path or URL
-  },
-  siteName: {
     type: String,
-  },
-  siteTitle: {
-    type: String,
-  },
-  themeColor: {
-    type: String,
+    required: true
   },
   footerDescription: {
     type: String,
+    required: true
   },
-  taxOnTicket: {
-    type: Number,
-  },
-  backupAndRestore: {
-    type: Boolean,
-    default: false,
-  },
- 
-  currencyOptions: {
-    type: String,
-  },
-  siteLanguage: {
-    type: String,
-  },
+  socialLinks: {
+    facebook: {
+      type: String,
+      required:true
+    },
+    twitter: {
+      type: String,
+      required: true
+    },
+    instagram: {
+      type: String,
+      required: true
+    }
+  }
 });
 
 const Setting = mongoose.model('Setting', settingSchema);
