@@ -1,23 +1,77 @@
 const Booking = require('../../models/Booking');
 const Event = require('../../models/Event');
 const CustomError = require('../../errors/CustomError');
-const paginate = require('../../utils/paginate');
-
-
+ 
 const getAllBookings = async (req, res, next) => {
     try {
-        let { page, limit } = req.pagination;
-        const bookings = await paginate(Booking, {}, page, limit, {}, 'eventId');
-        
-        if (bookings.data.length === 0) {
+        let { page = 1, limit = 10 } = req.pagination;
+        const { search } = req.query;
+
+        page = parseInt(page, 10);
+        limit = parseInt(limit, 10);
+
+        if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+            return next(new CustomError('Invalid pagination values', 400));
+        }
+
+        let searchFilter = {};
+        if (search) {
+            searchFilter = {
+                'event.title': { $regex: search, $options: 'i' }  
+            };
+        }
+
+        const skip = (page - 1) * limit;
+        const bookings = await Booking.aggregate([
+            {
+                $lookup: {
+                    from: "events",
+                    localField: "eventId",
+                    foreignField: "_id",
+                    as: "event"
+                }
+            },
+            { 
+                $unwind: "$event"
+            },
+            {
+                $match: searchFilter
+            },
+            {
+                $facet: {
+                    data: [
+                        { $skip: skip },
+                        { $limit: limit },
+                    ],
+                    totalRecords: [
+                        { $count: "count" }
+                    ]
+                }
+            }
+        ]);
+
+        const totalRecords = bookings[0].totalRecords.length > 0 ? bookings[0].totalRecords[0].count : 0;
+        const totalPages = Math.ceil(totalRecords / limit);
+        const prevPage = page > 1 ? page - 1 : null;
+        const nextPage = page < totalPages ? page + 1 : null;
+
+        if (bookings[0].data.length === 0) {
             return next(new CustomError('No booking found!', 404));
         }
 
-        res.status(200).json(bookings);
+        res.status(200).json({
+            data: bookings[0].data,
+            totalRecords,
+            totalPages,
+            prevPage,
+            nextPage,
+            page
+        });
     } catch (err) {
         next(new CustomError(err.message, 500));
     }
 };
+
 
 
 const getBookingsForUser = async (req, res, next) => {
