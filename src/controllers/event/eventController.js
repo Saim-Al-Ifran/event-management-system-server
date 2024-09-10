@@ -3,12 +3,24 @@ const Event = require("../../models/Event");
 const fetchEvents = require("../../services/event/fetchEvents");
 const updateEventDetails = require("../../services/event/updateEventDetails");
 const { uploadImageToCloudinary } = require("../../utils/imageUploadCloudinary");
- 
+const paginate = require('../../utils/paginate') 
 const deleteEventById = require("../../services/event/deleteEvent");
 
-
-const getEvents = async(_req,res,next)=>{
-        await fetchEvents({},res,next);
+const getEvents = async(req,res,next)=>{
+        try {
+               let {page,limit} = req.pagination;
+               const { search } = req.query;
+               const query = search
+               ? { title: { $regex: search, $options: 'i' } }  
+               : {};
+               const events = await paginate(Event,query,page,limit);
+               if(events.length === 0){
+                  return next(new CustomError('No events found!!',404));
+               }
+               res.status(200).json({events});
+        } catch (err) {
+                next(new CustomError(err.message,500));   
+        }
 }
 const getUserEvents = async(req,res,next)=>{
         const userId = req.user.id;
