@@ -17,11 +17,25 @@ const getEvents = async(req,res,next)=>{
                if(events.length === 0){
                   return next(new CustomError('No events found!!',404));
                }
-               res.status(200).json({events});
+               res.status(200).json(events);
         } catch (err) {
                 next(new CustomError(err.message,500));   
         }
 }
+
+const getSingleEvent = async(req,res,next)=>{
+      try {
+         const { eventId } = req.params;
+         const event = await Event.findById(eventId);
+         if (!event) {
+             return next(new CustomError('Event not found', 404));
+         }
+         res.status(200).json(event)
+      } catch (err) {
+        next(new CustomError(err.message,500));
+      }
+}
+
 const getUserEvents = async(req,res,next)=>{
         const userId = req.user.id;
         await fetchEvents({author:userId},res,next);
@@ -30,7 +44,7 @@ const getUserEvents = async(req,res,next)=>{
 const createEvent = async (req, res, next) => {
     try {
       
-        const { title, description, date, location, capacity, category,price } = req.body;
+        const { title, description, date, location, capacity, category,price,status } = req.body;
          
         const cloudinaryResult = await uploadImageToCloudinary(req.file);
         
@@ -43,7 +57,7 @@ const createEvent = async (req, res, next) => {
             image: cloudinaryResult.secure_url,
             category,
             price,
-            status:'active',
+            status:status,
             author:req.user.id
         });
 
@@ -179,6 +193,7 @@ const approveEvent = async (req, res, next) => {
 
 module.exports = {
     getEvents,
+    getSingleEvent,
     createEvent,
     updateEvent,
     duplicateEvent,

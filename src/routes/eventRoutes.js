@@ -6,7 +6,8 @@ const {
      sortEvents,
      getEvents,
      deleteEvent,
-     approveEvent
+     approveEvent,
+     getSingleEvent
   } = require('../controllers/event/eventController');
   
 const { authenticate } = require('../middlewares/auth/authenticate');
@@ -18,6 +19,7 @@ const paginationMiddleware = require('../middlewares/paginationMiddleware');
 const router = require('express').Router();
 
 router.get('/',paginationMiddleware,getEvents);
+router.get('/:eventId',paginationMiddleware,getSingleEvent);
 router.post('/', authenticate,checkAdminOrSuperAdmin, upload.single('image'), validateEventFields , runValidation ,createEvent);
 router.put('/:eventId', authenticate , checkAdminOrSuperAdmin , upload.single('image'),validateEventFields , runValidation , updateEvent);
 router.delete('/:eventId', authenticate , checkAdminOrSuperAdmin , deleteEvent);

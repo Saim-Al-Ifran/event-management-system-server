@@ -14,7 +14,12 @@ const deleteEventById = async (eventId, userId, res, next) => {
         }
 
         if (existingEvent.image) {
-            await deleteImageFromCloudinary(existingEvent.image);
+            try {
+                await deleteImageFromCloudinary(existingEvent.image);
+            } catch (cloudinaryErr) {
+                // Log Cloudinary error but proceed with event deletion
+                console.error(`Cloudinary Error: ${cloudinaryErr.message}`);
+            }
         }
 
         await Event.deleteOne({ _id: existingEvent._id });
