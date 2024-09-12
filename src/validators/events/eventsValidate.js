@@ -22,6 +22,7 @@ const validateEventFields = [
         .withMessage('Event capacity is required'),
 
     body('image')
+        .optional()
         .custom((_value, { req }) => {
             if (!req.file) {
                 throw new Error('Image field required');

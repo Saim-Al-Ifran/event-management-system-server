@@ -1,5 +1,7 @@
+const { uploadImageToCloudinary } = require("../../utils/imageUploadCloudinary");
+
 const updateEventDetails = async (existingEvent, req ,res) => {
-    const { title, description, date, location, capacity, category, price } = req.body;
+    const { title, description, date, location, capacity, category, price,status } = req.body;
     const image = req.file;
     
     let updatedImageUrl = existingEvent.image;
@@ -17,6 +19,7 @@ const updateEventDetails = async (existingEvent, req ,res) => {
     existingEvent.category = category || existingEvent.category;
     existingEvent.price = parseFloat(price) || existingEvent.price;
     existingEvent.image = updatedImageUrl;
+    existingEvent.status = status;
 
     await existingEvent.save();
     res.status(200).json({ message: 'Event updated successfully', event: existingEvent });
