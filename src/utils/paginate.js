@@ -1,4 +1,4 @@
-const paginate = async (model, query, page, limit, sort = {}, populateFields = '') => {
+const paginate = async (model, query, page, limit, sort = {}, populateFields = '',selectField = '') => {
   const skip = (page - 1) * limit;
   
   const data = await model
@@ -7,6 +7,7 @@ const paginate = async (model, query, page, limit, sort = {}, populateFields = '
       .limit(limit)
       .sort(sort)
       .populate(populateFields) 
+      .select(selectField)
       .exec();
 
   const totalRecords = await model.countDocuments(query).exec();

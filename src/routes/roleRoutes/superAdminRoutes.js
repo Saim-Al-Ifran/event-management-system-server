@@ -15,6 +15,7 @@ const {
  
 const { authenticate } = require('../../middlewares/auth/authenticate');
 const authorizeSuperAdmin = require('../../middlewares/auth/authorizeSuperAdmin');
+const paginationMiddleware = require('../../middlewares/paginationMiddleware');
 const upload = require('../../middlewares/upload');
 const runValidation = require('../../validators');
 const {validateUserData} = require('../../validators/user/auth');
@@ -22,7 +23,7 @@ const {validateUserData} = require('../../validators/user/auth');
 const router = require('express').Router();
    
 router.post('/entities', authenticate, authorizeSuperAdmin, validateUserData , runValidation,superAdminRegisterController);
-router.get('/entities', authenticate, authorizeSuperAdmin, getAllEntities);
+router.get('/entities', authenticate, authorizeSuperAdmin,paginationMiddleware,getAllEntities);
 router.get('/entities/:entityId', authenticate, authorizeSuperAdmin, getSingleEntity);
 router.put('/entities/:entityId', authenticate, authorizeSuperAdmin , validateUserData , runValidation, updateSingleEntity);
 router.patch('/entities/:entityId', authenticate, authorizeSuperAdmin, superAdminBlockUnblock);

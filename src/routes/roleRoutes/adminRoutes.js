@@ -19,10 +19,11 @@ const {
 const upload = require('../../middlewares/upload');
 const { validateUserData } = require('../../validators/user/auth');
 const runValidation = require('../../validators');
+const paginationMiddleware = require('../../middlewares/paginationMiddleware');
 
  
 
-router.get('/users', authenticate, authorizeAdmin, adminGetAllUsers);
+router.get('/users', authenticate, authorizeAdmin,paginationMiddleware, adminGetAllUsers);
 router.get('/users/:userId', authenticate, authorizeAdmin, adminGetSingleUser);
 router.put('/users/:userId', authenticate, authorizeAdmin,validateUserData , runValidation, adminUpdateUser);
 router.post('/users', authenticate, authorizeAdmin,validateUserData , runValidation, adminCreateUser);

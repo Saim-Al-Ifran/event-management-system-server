@@ -19,7 +19,7 @@ const superAdminRegisterController = async(req,res,next)=>{
                          phoneNumber:phoneNumber,
                          email:email,
                          password:hashedPassword,
-                         role:role
+                         role:role || 'user'
                      });
                      
                      await newEntity.save();

@@ -7,15 +7,36 @@ const resetPassword = require("../../utils/user/resetPassword");
 const {findUserAndCheckImage} = require('../../utils/findUserAndCheckImage');
 
 const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
+const paginate = require("../../utils/paginate");
 
-        const getAllEntities= async(_req,res,next)=>{
-                    try {
-                            const entity = await User.find({});
-                            res.status(200).json({users:entity});
-                    } catch (err) {
-                            next(new CustomError(err.message,500));
-                    }
-        }
+const getAllEntities = async (req, res, next) => {
+    try {
+      let { limit, page } = req.pagination;
+      const { search } = req.query;
+  
+      let query = {
+        role: ['admin', 'user'],
+      };
+      
+      if (search) {
+        query.$or = [
+          { username: { $regex: search, $options: 'i' }},  
+          { email: { $regex: search, $options: 'i' } },  
+          { role: { $regex: search, $options: 'i' } },  
+        ];
+      }
+
+      const entity = await paginate(User, query, page, limit, {}, '', '-password');
+      if(entity.data.length === 0){
+         return next(new CustomError('No users found',404));
+      }
+      res.status(200).json({ users: entity });
+
+    } catch (err) {
+      next(new CustomError(err.message, 500));
+    }
+  };
+  
 
         const getSingleEntity = async(req,res,next)=>{
                     const {entityId} = req.params;
@@ -31,7 +52,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
                     }
         }
 
-          const updateSingleEntity= async(req,res,next)=>{
+        const updateSingleEntity= async(req,res,next)=>{
                     const {entityId} = req.params;
                     const updatedData  = req.body;
                 
@@ -52,7 +73,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
                     }
           }
 
-          const superAdminBlockUnblock = async(req,res,next)=>{
+        const superAdminBlockUnblock = async(req,res,next)=>{
                 
                         const {entityId} = req.params;
                         const {block} = req.body;
@@ -79,7 +100,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
                         }
            }
 
-          const superAdminDelete = async (req, res, next) => {
+        const superAdminDelete = async (req, res, next) => {
                 const { entityId } = req.params;
                 try {
                     const entity = await User.findById(entityId);
@@ -95,7 +116,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
                 }
           };
 
-          const getSuperAdminProfile = async(req,res,next)=>{
+        const getSuperAdminProfile = async(req,res,next)=>{
 
                 try {
                         const superAdminId = req.user.id;  
@@ -110,7 +131,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
 
            }  
 
-          const updateSuperAdminProfile = async (req, res, next) => {
+        const updateSuperAdminProfile = async (req, res, next) => {
             try {
                 const superAdminId = req.user.id; 
                 const updatedData= req.body;
@@ -124,7 +145,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
           };
    
  
-          const resetSuperAdminPassword = async(req,res,next)=>{
+        const resetSuperAdminPassword = async(req,res,next)=>{
 
                 try {
                     await resetPassword(req,res,next,'super-admin')
@@ -133,7 +154,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
                 }  
           }
 
-          const resetAdminPassword = async(req,res,next)=>{
+        const resetAdminPassword = async(req,res,next)=>{
             try {
                await resetPassword(req,res,next,'admin');
             } catch (err) {
@@ -143,7 +164,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
           }
    
 
-          const adminGetSingleUser = async(req,res,next)=>{
+        const adminGetSingleUser = async(req,res,next)=>{
               try {
                      const { userId } = req.params;
                      const user = await User.findById(userId);
@@ -162,12 +183,25 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
               }
           }
 
-          const adminGetAllUsers = async (_req, res, next) => {
-
+        const adminGetAllUsers = async (req, res, next) => {
               try {
+                  let  { limit , page} = req.pagination;
+                  const {search} = req.query;
+                  let query = {
+                     role:'user'
+                  }
+                  if (search) {
+                    query.$or = [
+                      { username: { $regex: search, $options: 'i' }},  
+                      { email: { $regex: search, $options: 'i' } },  
+                      { role: { $regex: search, $options: 'i' } },  
+                    ];
+                  }
 
-                  const users = await User.find({ role: 'user' })
-                                          .select("-password");
+                  const users = await paginate(User, query, page, limit, {}, '', '-password');;
+                  if(users.data.length === 0){
+                       return next(new CustomError('No users found',404))
+                  }
                   res.status(200).json({ users });
 
               } catch (err) {
@@ -176,7 +210,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
        
           };
 
-          const adminCreateUser = async (req, res, next) => {
+        const adminCreateUser = async (req, res, next) => {
               try {
                      const { username, email, password } = req.body;
 
@@ -190,7 +224,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
               }
           };
 
-          const adminUpdateUser = async (req, res, next) => {
+        const adminUpdateUser = async (req, res, next) => {
               try {
                   const { userId } = req.params;
                   const { username , phoneNumber , email , password } = req.body;
@@ -224,7 +258,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
               }
           };
 
-          const adminDeleteUser = async (req, res, next) => {
+        const adminDeleteUser = async (req, res, next) => {
               try {
                   const { userId } = req.params;
 
@@ -247,7 +281,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
               }
           };
 
-          const adminBlockUnblockUser = async (req, res, next) => {
+        const adminBlockUnblockUser = async (req, res, next) => {
            
               try {
                   const { userId } = req.params;
@@ -283,7 +317,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
               }
           };
 
-          const getAdminProfile = async (req, res, next) => {
+        const getAdminProfile = async (req, res, next) => {
               try {
                 
                   const adminId = req.user.id;
@@ -304,7 +338,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
               }
           };
 
-          const updateAdminProfile = async (req, res, next) => {
+        const updateAdminProfile = async (req, res, next) => {
             try {
                 const adminId = req.user.id;  
                 const { username, email , phoneNumber , newPassword } = req.body;
@@ -439,9 +473,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
                        next(new CustomError(err.message,500));
                  }
         }
-
-
-         
+        
         const resetUserPassword = async(req,res,next)=>{
 
             try {
@@ -449,9 +481,9 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
             } catch (err) {
                 next(new CustomError(err.message,500));
             }  
-      }
+        }
     
-      const getUserProfileImage = async (req, res, next) => {
+       const getUserProfileImage = async (req, res, next) => {
 
         try {
             const user = await findUserAndCheckImage(req.user.id);
@@ -460,9 +492,9 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
         } catch (err) {
             next(new CustomError(err.message, 500));
         }
-    };
+        };
 
-    const updateUserProfileImage = async (req, res, next) => {
+       const updateUserProfileImage = async (req, res, next) => {
         try {
     
             const result = await  uploadImageToCloudinary(req.file);
@@ -481,7 +513,7 @@ const {uploadImageToCloudinary} = require("../../utils/imageUploadCloudinary");
             
             next(new CustomError(err.message, 500));
         }
-    };
+        };
          
  
 
