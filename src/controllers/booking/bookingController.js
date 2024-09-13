@@ -1,7 +1,8 @@
 const Booking = require('../../models/Booking');
 const Event = require('../../models/Event');
 const CustomError = require('../../errors/CustomError');
- 
+const paginate = require('../../utils/paginate');
+
 const getAllBookings = async (req, res, next) => {
     try {
         let { page = 1, limit = 10 } = req.pagination;
@@ -72,7 +73,7 @@ const getAllBookings = async (req, res, next) => {
     }
 };
 
-
+ 
 
 const getBookingsForUser = async (req, res, next) => {
     
