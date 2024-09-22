@@ -18,12 +18,14 @@ const validateUserData = [
     .isLength({ min: 11, max: 11 })
     .withMessage('Phone number should be exactly 11 characters long'),
   body('email')
+    .optional()
     .trim()
     .notEmpty()
     .withMessage('Email is required')
     .isEmail()
     .withMessage('Invalid email address'),
   body('password')
+    .optional()
     .trim()
     .notEmpty()
     .withMessage('Password is required')

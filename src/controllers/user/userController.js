@@ -63,7 +63,7 @@ const getAllEntities = async (req, res, next) => {
                             }
 
                             const entity = await User.findByIdAndUpdate(entityId,updatedData,{ new : true })
-                                                    .select("-password");
+                                                     .select("-password");
                             if(!entity){
                                 return next(new CustomError('User not found',404));
                             }
@@ -167,7 +167,8 @@ const getAllEntities = async (req, res, next) => {
         const adminGetSingleUser = async(req,res,next)=>{
               try {
                      const { userId } = req.params;
-                     const user = await User.findById(userId);
+                     const user = await User.findById({_id:userId,role:'user'})
+                                            .select("-password");
                                             
        
                      if (!user) {
@@ -227,23 +228,22 @@ const getAllEntities = async (req, res, next) => {
         const adminUpdateUser = async (req, res, next) => {
               try {
                   const { userId } = req.params;
-                  const { username , phoneNumber , email , password } = req.body;
-          
+                  const { username , phoneNumber , email , password, isBlocked } = req.body;
+                  console.log("user status is : ",isBlocked);
+                  
                   const user = await User.findById(userId);
                
                   if (!user) {
                       return res.status(404).json({ error: 'User not found' });
                   }
  
-                // Check if the user is an admin
-                 checkUserRole(user,'user');
-
-                // Update user information
+                  checkUserRole(user,'user');
+                  
                   user.username = username || user.username;
                   user.email = email || user.email;
                   user.phoneNumber = phoneNumber || user.phoneNumber;
-          
-               // Update password if provided
+                  user.isBlocked = isBlocked;         
+
                   if (password) {
                       const hashedPassword = await bcrypt.hash(password, 10);
                       user.password = hashedPassword;

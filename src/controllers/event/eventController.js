@@ -14,7 +14,7 @@ const getEvents = async(req,res,next)=>{
                ? { title: { $regex: search, $options: 'i' } }  
                : {};
                const events = await paginate(Event,query,page,limit);
-               if(events.length === 0){
+               if(events.data.length === 0){
                   return next(new CustomError('No events found!!',404));
                }
                res.status(200).json(events);
