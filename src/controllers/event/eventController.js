@@ -5,68 +5,50 @@ const updateEventDetails = require("../../services/event/updateEventDetails");
 const { uploadImageToCloudinary } = require("../../utils/imageUploadCloudinary");
 const paginate = require('../../utils/paginate') 
 const deleteEventById = require("../../services/event/deleteEvent");
-
-// const getEvents = async(req,res,next)=>{
-//         try {
-//                let {page,limit} = req.pagination;
-//                const { search } = req.query;
-//                const query = search
-//                ? { title: { $regex: search, $options: 'i' } }  
-//                : {};
-//                const events = await paginate(Event,query,page,limit);
-//                if(events.data.length === 0){
-//                   return next(new CustomError('No events found!!',404));
-//                }
-//                const currentDate = new Date();
-
-//                // Filter upcoming events: events where the event date is in the future
-//                const upcomingEvents = events.data.filter(event => new Date(event.date) > currentDate);
-           
-//                // Filter latest events: events within the last 7 or 30 days
-//                const daysAgo = 30; // Change this to 7 if you want last 7 days
-//                const latestEvents = events.data.filter(event => {
-//                  const eventDate = new Date(event.date);
-//                  const timeDifference = (currentDate - eventDate) / (1000 * 3600 * 24); // Difference in days
-//                  return timeDifference <= daysAgo && timeDifference >= 0;
-//                });
-//                res.status(200).json(upcomingEvents,latestEvents);
-//         } catch (err) {
-//                 next(new CustomError(err.message,500));   
-//         }
-// }
-
+const Category = require('../../models/Category');
+ 
 const getEvents = async (req, res, next) => {
     try {
-      let { page, limit } = req.pagination || { page: 1, limit: 10 };  // Default to page 1 and limit 10
-      const { search } = req.query;
+      let { page, limit } = req.pagination ;  
+      const { search, category,sort } = req.query;   
+   
+      const query = {};
+      if(search) {
+        query.title = { $regex: search, $options: 'i' }
+      } 
   
-      // Query to search for events by title
-      const query = search
-        ? { title: { $regex: search, $options: 'i' } }
-        : {};
-  
-      // Fetch paginated events
-      const events = await paginate(Event, query, page, limit);
-  
-    
+      if (category) {
+        const categoryData = await Category.findOne({ name: {$regex:category,$options:'i'}});
+        if (categoryData) {
+          query.category = categoryData._id;   
+        } else {
+          return next(new CustomError('Category not found!', 404));
+        }
+      }
+      
+      const sortOption = sort === 'asc' ? { date: 1 } : { date: -1 }; 
+
+      
+      const events = await paginate(Event, query, page, limit, sortOption, 'category');
+      
       if (events.data.length === 0) {
         return next(new CustomError('No events found!!', 404));
       }
-  
+      
       const currentDate = new Date();
-  
-    
+      
+      // Filter for upcoming events
       const upcomingEvents = events.data.filter(event => new Date(event.date) > currentDate);
-
-      const daysAgo = 30;  
+  
+      // Filter for latest events in the last 30 days
+      const daysAgo = 30;
       const latestEvents = events.data.filter(event => {
         const eventDate = new Date(event.date);
-        const timeDifference = (currentDate - eventDate) / (1000 * 3600 * 24);  
+        const timeDifference = (currentDate - eventDate) / (1000 * 3600 * 24);  // Convert to days
         return timeDifference <= daysAgo && timeDifference >= 0;
       });
-       
       
-      res.status(200).json({...events,upcomingEvents,latestEvents});
+      res.status(200).json({ ...events, upcomingEvents, latestEvents });
   
     } catch (err) {
       next(new CustomError(err.message, 500));
@@ -77,7 +59,7 @@ const getEvents = async (req, res, next) => {
 const getSingleEvent = async(req,res,next)=>{
       try {
          const { eventId } = req.params;
-         const event = await Event.findById(eventId);
+         const event = await Event.findById(eventId).populate('category');
          if (!event) {
              return next(new CustomError('Event not found', 404));
          }
@@ -109,7 +91,7 @@ const createEvent = async (req, res, next) => {
             category,
             price,
             status:status,
-            author:req.user.id
+            author:req.user.email
         });
 
         if(req.user.role === 'user'){

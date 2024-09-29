@@ -2,7 +2,7 @@ const CustomError = require("../../errors/CustomError");
 
 const checkAdminOrSuperAdmin = (req, _res, next) => {
     try {
-        console.log(req.user.role);
+         
         const user = req.user; 
         if (!user || (user.role !== 'admin' && user.role !== 'super-admin')) {
           return next(new CustomError('Unauthorized: Access denied. Admin or superadmin role required', 403));

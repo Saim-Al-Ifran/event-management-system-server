@@ -24,7 +24,7 @@ const authenticate = async(req,_res,next)=>{
      }catch(err){
              
       if (err.name === 'TokenExpiredError') {
-        return next(new CustomError('Token expired',401));
+        return next(new CustomError('Token expired! please login',401));
       }
   
       if (err.name === 'JsonWebTokenError') {
