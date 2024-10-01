@@ -30,8 +30,14 @@ const userSchema = new mongoose.Schema({
     },
     password: {
       type: String,
-      required: true,
-      minlength: 6, 
+      minlength: 6,
+      required: function () {
+        return !this.firebaseUID;  // Optional for Firebase users
+      },
+    },
+    firebaseUID: {
+      type: String,  
+      unique: true,
     },
     image: {
       type: String,
