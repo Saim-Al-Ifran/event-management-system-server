@@ -60,7 +60,8 @@ const loginController = async(req,res,next)=>{
                    id:user.id,
                    name:user.username,
                    email:user.email,
-                   role:user.role
+                   role:user.role,
+                   image:user.image
                }
        
                const token = jwt.sign(payload,secretKey,{expiresIn:'1hr'});
@@ -96,7 +97,8 @@ const userRegisterController  = async(req,res,next)=>{
                     phoneNumber:phoneNumber,
                     email:email,
                     password:hashedPassword,
-                    role:"user"
+                    role:"user",
+                    
                 });
                 await newUser.save();
 
@@ -136,7 +138,8 @@ const userLoginController = async(req,res,next)=>{
                    id:user.id,
                    name:user.username,
                    email:user.email,
-                   role:user.role
+                   role:user.role,
+                   image:user.image
                }
        
                const token = jwt.sign(payload,secretKey,{expiresIn:'1hr'});
@@ -152,13 +155,36 @@ const userLoginController = async(req,res,next)=>{
         }
 }
 
-module.exports = {
+const saveUserOnfirebaseLogin = async(req,res,next)=>{
+      try{
+      
+            const {username,phoneNumber,email,image,uid} = req.body
+            let user = await User.findOne({email:email});
+ 
+            if(!user){
+                  user = new User({
+                        username: username|| 'Anonymous', 
+                        phoneNumber:phoneNumber || 'N/A',
+                        email,
+                        firebaseUID: uid,
+                        image: image || 'N/A', 
+                  });
+                  await user.save()   
+            }
+            res.status(200).json({ message: 'Firebase user login successfully', user });
+            
+      }catch(err){
+          next(new CustomError(err.message,500));
+      }
+ 
+}
 
+module.exports = {
      superAdminRegisterController,
      logoutController,
      loginController,
      logoutController,
      userRegisterController,
-     userLoginController
-
+     userLoginController,
+     saveUserOnfirebaseLogin 
 }

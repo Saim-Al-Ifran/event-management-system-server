@@ -3,19 +3,12 @@ const userSchema = new mongoose.Schema({
     username: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
       minlength: 3,
       maxlength: 30,
     },
     phoneNumber: {
       type: String,
-      validate: {
-        validator: function (value) {
-          return /^\d{11}$/.test(value);
-        },
-        message: 'Phone number must be exactly 11 digits',
-      },
     },
     email: {
       type: String,
@@ -31,9 +24,6 @@ const userSchema = new mongoose.Schema({
     password: {
       type: String,
       minlength: 6,
-      required: function () {
-        return !this.firebaseUID;  // Optional for Firebase users
-      },
     },
     firebaseUID: {
       type: String,  
@@ -41,7 +31,7 @@ const userSchema = new mongoose.Schema({
     },
     image: {
       type: String,
-      default:'/default/image/path.jpg'
+
     },
     role: {
       type: String,
