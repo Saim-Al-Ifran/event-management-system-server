@@ -127,6 +127,7 @@ const userLoginController = async(req,res,next)=>{
                    return next(new CustomError('Only Registered user can access',403))
                }
                const isMatch = await bcrypt.compare(password,user.password);
+               console.log(password,)
                if(!isMatch){
                      return next(new CustomError('Invalid Credential',403));
                }
@@ -144,7 +145,7 @@ const userLoginController = async(req,res,next)=>{
                     return next(new CustomError('Failed to generate token'));
                }
        
-               return res.status(202).json({message:'Login Successfull',token});
+               return res.status(202).json({message:'Login Successfull',token,data:{user:payload}});
 
         } catch (err) {
               next(new CustomError(err.message,500));
