@@ -174,6 +174,8 @@ const saveUserOnfirebaseLogin = async(req,res,next)=>{
             res.status(200).json({ message: 'Firebase user login successfully', user });
             
       }catch(err){
+          console.log(err);
+          
           next(new CustomError(err.message,500));
       }
  

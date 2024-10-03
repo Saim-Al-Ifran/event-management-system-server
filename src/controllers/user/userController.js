@@ -440,13 +440,14 @@ const getAllEntities = async (req, res, next) => {
 
         const getUserProfile = async(req,res,next)=>{
             try {
-                const superAdminId = req.user.id;  
-                const superAdmin = await User.findById(superAdminId)
+                
+                const email = req.user.email;  
+                const user = await User.findOne({email:email})
                                               .select("-password");
-                if(!superAdmin){
+                if(!user){
                     return next(new CustomError('User not found',404));
                 }
-                res.status(200).json({profile:superAdmin});
+                res.status(200).json({profile:user});
             } catch (err) {
                     next(new CustomError(err.message,500));  
             }

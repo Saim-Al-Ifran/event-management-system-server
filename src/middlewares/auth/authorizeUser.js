@@ -1,3 +1,4 @@
+const CustomError = require("../../errors/CustomError");
 const authorizeUser = (req, _res, next) => {
     if (req.user && req.user.role === 'user') {
         next();

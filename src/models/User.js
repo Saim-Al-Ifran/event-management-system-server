@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema({
     },
     firebaseUID: {
       type: String,  
-      unique: true,
     },
     image: {
       type: String,
