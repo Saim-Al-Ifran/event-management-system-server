@@ -455,15 +455,14 @@ const getAllEntities = async (req, res, next) => {
 
         const userProfileUpdate = async(req,res,next)=>{
                  try{
-                         const userId = req.user.id;
-                         const{username,email,phoneNumber} = req.body;
-                         const user = await User.findById(userId)
+                         const email= req.user.email;
+                         const{username,phoneNumber} = req.body;
+                         const user = await User.findOne({email:email})
                                                  .select("-password");
                          if(!user){
                                return next(new CustomError('user not found',404));
                          }
                          user.username = username || user.username;
-                         user.email = email || user.email;
                          user.phoneNumber = phoneNumber || user.phoneNumber;
                          user.role = "user";
 
@@ -501,9 +500,9 @@ const getAllEntities = async (req, res, next) => {
             const result = await  uploadImageToCloudinary(req.file);
     
             // Find the existing super admin user and update the image field
-            const user = await User.findById(req.user.id);
+            const user = await User.findOne({email:req.user.email});
             if (!user) {
-                return res.status(404).json({ error: 'Super Admin not found' });
+                return res.status(404).json({ error: 'User not found' });
             }
     
             user.image = result.secure_url;
