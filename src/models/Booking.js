@@ -6,20 +6,14 @@ const bookingSchema = new mongoose.Schema({
     ref: 'Event',
     required: true,
   },
-  attendeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+  attendeEmail: {
+    type: String,
     required: true,
   },
   requestToDelete: {
     type: Boolean, 
     default: false,
   },
-  ticketQuantity: {
-    type: Number,
-    required: true,
-},
-
  
   createdAt: {
     type: Date,

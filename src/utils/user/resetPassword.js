@@ -4,10 +4,10 @@ const bcrypt = require('bcrypt');
 
 const resetPassword = async (req, res, next, userType) => {
     try {
-        const userId = req.user.id;
+        const userEmail = req.user.email;
         const { oldPassword, newPassword } = req.body;
 
-        const user = await User.findById(userId);
+        const user = await User.findOne({email: userEmail});
 
         if (!user) {
             return next(new CustomError(`${userType} not found`, 404));
@@ -16,7 +16,7 @@ const resetPassword = async (req, res, next, userType) => {
         const isMatched = await bcrypt.compare(oldPassword, user.password);
 
         if (!isMatched) {
-            return next(new CustomError('Password does not match', 401));
+            return next(new CustomError('The current password you entered is incorrect', 401));
         }
 
         const saltRounds = 10;
