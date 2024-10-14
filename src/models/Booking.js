@@ -6,7 +6,7 @@ const bookingSchema = new mongoose.Schema({
     ref: 'Event',
     required: true,
   },
-  attendeEmail: {
+  attendeEmail: { 
     type: String,
     required: true,
   },
@@ -14,7 +14,10 @@ const bookingSchema = new mongoose.Schema({
     type: Boolean, 
     default: false,
   },
- 
+  amount: {
+    type: Number,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now,
