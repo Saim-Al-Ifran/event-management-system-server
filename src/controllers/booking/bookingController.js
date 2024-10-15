@@ -78,8 +78,8 @@ const getAllBookings = async (req, res, next) => {
 const getBookingsForUser = async (req, res, next) => {
     
     try {
-        const userId = req.user.id;
-        const bookings = await Booking.find({ attendeId: userId })
+        const email = req.user.email;
+        const bookings = await Booking.find({ attendeEmail: email })
                                       .populate('eventId');
 
         if (!bookings) {
