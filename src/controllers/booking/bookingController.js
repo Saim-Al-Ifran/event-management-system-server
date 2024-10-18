@@ -151,9 +151,9 @@ const bookEvent = async (req, res, next) => {
 const requestBookingCancellation = async (req, res, next) => {
     try {
         const { bookingId } = req.params;
-        const userId = req.user.id;
+        const email = req.user.email;
 
-        const booking = await Booking.findOne({ _id: bookingId, attendeId: userId });
+        const booking = await Booking.findOne({ _id: bookingId, attendeEmail: email });
         if (!booking) {
             return next(new CustomError('Booking not found', 404));
         }
@@ -183,7 +183,7 @@ const deleteBookings = async(req,res,next)=>{
                         return next(new CustomError('Associated event not found', 404));
                     }
 
-                    event.capacity += booking.ticketQuantity;
+                   
                     await Booking.deleteOne({_id:bookingId});
                     await event.save();
 
