@@ -1,4 +1,5 @@
 const CustomError = require("../../errors/CustomError");
+const Booking = require("../../models/Booking");
 const Category = require("../../models/Category");
 const Event = require("../../models/Event");
 const User = require("../../models/User");
@@ -17,22 +18,31 @@ const getDashboardData = async (req, res, next) => {
         }
       ]);
 
-    const userStats = await User.aggregate([
+      const userStats = await User.aggregate([
       {
         $facet: {
           totalUsers: [{ $count: "total" }],
           activeUsers: [{ $match: { isBlocked: false } }, { $count: "total" }],
         }
       }
-    ]);
+      ]);
   
-   const categoryStats = await Category.aggregate([
+     const categoryStats = await Category.aggregate([
         {
           $facet: {
             totalCategories: [{ $count: "total" }] 
           }
         }
       ]);
+
+     const revenueStats = await Booking.aggregate([
+      {
+        $group: {
+          _id: null, 
+          totalAmount: { $sum: "$amount" }
+        }
+      }
+     ]);
  
       const dashboardData = {
         events: {
@@ -40,7 +50,7 @@ const getDashboardData = async (req, res, next) => {
           active: eventStats[0]?.activeEvents[0]?.total || 0,
           pending: eventStats[0]?.pendingEvents[0]?.total || 0,
           completed: eventStats[0]?.completedEvents[0]?.total || 0,
-          totalRevenue: eventStats[0]?.totalRevenue[0]?.total || 0,
+          totalRevenue: revenueStats[0]?.totalAmount || 0 ,
         },
         users: {
           total: userStats[0]?.totalUsers[0]?.total || 0,
