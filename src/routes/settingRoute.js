@@ -7,7 +7,7 @@ const { validateSettingFields } = require('../validators/settings/settingsValida
 
 const router  = require('express').Router();
 
-router.get('/',authenticate,checkAdminOrSuperAdmin,getSettings);
+router.get('/',getSettings);
 router.post('/',upload.single('image'),authenticate,checkAdminOrSuperAdmin,validateSettingFields,runValidation,createOrUpdateSettings)
 
 
