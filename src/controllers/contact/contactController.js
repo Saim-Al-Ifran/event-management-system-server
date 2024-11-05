@@ -18,14 +18,13 @@ const getAllFeedback = async(req,res,next)=>{
 const sendMessageController = async(req,res,next)=>{
            try{
             const { title, email, message, phoneNumber } = req.body;
-            const author = req.user.id;
+            
       
             const newContact = new Contact({
               title,
               email,
               phoneNumber,
               message,
-              author
             });
       
             const savedContact = await newContact.save();
