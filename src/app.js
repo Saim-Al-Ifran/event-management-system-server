@@ -26,6 +26,12 @@ app.use(cors());
 app.use(compression());
 app.use(router);
 
+
+app.get('/', (_req, res) => {
+  res.status(200).json({message:'welcome, server is running'});
+});
+
+
 // Default middleware for handling errors
 app.use((err, _req, res, _next) => {
   const message = err.message || 'Server Error Occurred';
